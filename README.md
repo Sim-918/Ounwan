@@ -15,3 +15,6 @@ To do list:
 ### 99.	회원가입->api
 - post_detail- 텍스트->이미지->텍스트->동영상->...
 # 1.	관리자페이지->신고기능
+
+
+![Image](https://github.com/user-attachments/assets/86a3f494-a7c6-4c1d-80fc-b2f89ed5da57)
