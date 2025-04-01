@@ -15,14 +15,14 @@
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ms-auto">
           <!-- 🚨 로그인 여부 확인 -->
-          <li class="nav-item" th:if="${username}">
-            <span class="nav-link">안녕하세요, <b th:text="${username}"></b> 님!</span>
+          <li class="nav-item" th:if="${userId}">
+            <span class="nav-link">안녕하세요, <b th:text="${userId}"></b> 님!</span>
           </li>
-          <li class="nav-item" th:if="${username}">
+          <li class="nav-item" th:if="${userId}">
             <a class="btn btn-outline-light" th:href="@{/mypage}">마이페이지</a>
             <a class="btn btn-outline-light" href="/logout">로그아웃</a>
           </li>
-          <li class="nav-item" th:if="${username == null}">
+          <li class="nav-item" th:if="${userId == null}">
             <a class="btn btn-outline-light" th:href="@{/login}">로그인</a>
             <a class="btn btn-outline-light" th:href="@{/register}">회원가입</a>
           </li>

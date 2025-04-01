@@ -1,46 +1,46 @@
 package Test.test_hello.controller;
 
 
-import Test.test_hello.service.UserService;
-import org.springframework.http.ResponseEntity;
+import Test.test_hello.domain.User;
+import Test.test_hello.dto.UserRegisterDto;
+import Test.test_hello.service.user.UserService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @Controller
-@RequestMapping("/register")
 public class UserController {
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String showRegisterPage(@RequestParam(value = "error", required = false) String error, Model model) {
-        if (error != null) {
-            model.addAttribute("errorMessage", error);
-        }
-        return "register"; // 🚀 `register.html` 반환
+    @GetMapping("/register")
+    public String showRegisterForm(Model model) {
+        model.addAttribute("userRegisterDto",new UserRegisterDto());
+        return "register";
     }
 
-    @PostMapping
-    public String registerUser(@RequestParam("username") String username,
-                               @RequestParam("email") String email,
-                               @RequestParam("password") String password,
-                               @RequestParam("confirmPassword") String confirmPassword,
-                               Model model) {
-        try {
-            userService.registerUser(username, email, password, confirmPassword);
-            return "redirect:/login"; // 🚀 회원가입 성공 후 로그인 페이지로 이동
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "register"; // 🚨 오류 발생 시 다시 `register.html` 로 이동
-        }
+//    @PostMapping("/register")
+//    public String registerUser(@ModelAttribute User user) {
+//        if (user.getRole() == null) {
+//            user.setRole(User.Role.U);
+//        }
+//        userService.registerUser(user);
+//        return "redirect:/login";
+//    }
+    @PostMapping("/register")
+    public String registerUser(@Valid @ModelAttribute UserRegisterDto userDto, BindingResult result) {
+        if (result.hasErrors()) return "register";
+
+        userService.register(userDto);
+        return "redirect:/login";
     }
+
 }

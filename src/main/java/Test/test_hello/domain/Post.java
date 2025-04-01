@@ -1,51 +1,47 @@
 package Test.test_hello.domain;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Entity
+@Table(name = "post")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id2")
+    private User user;
+
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String videoUrl; // ✅ 동영상 URL
+    private LocalDateTime creDt = LocalDateTime.now();
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime updDt;
 
-    // ✅ 게시글(N) → 사용자(1) 관계 (ManyToOne)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(length = 30)
+    private String updId;
 
-    // ✅ 게시글(1) → 이미지(N) 관계 (OneToMany)
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> images;
+    @Enumerated(EnumType.STRING)
+    private User.YesNo delYn = User.YesNo.N;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // ✅ 작성자 이름 반환
-    public String getAuthorName() {
-        return user != null ? user.getUsername() : "Unknown";
-    }
+    private int repCnt = 0;
+    private int likeCnt = 0;
+    private int unlikeCnt = 0;
+    private int viewCnt = 0;
 }

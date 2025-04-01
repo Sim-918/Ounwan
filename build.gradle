@@ -32,12 +32,12 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 	//Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-crypto'
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-	jvmArgs += ["-parameters"] // 올바른 방식으로 수정
-	options.compilerArgs.add("-parameters")
+	jvmArgs += ["-parameters"]
 }

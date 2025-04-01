@@ -1,12 +1,20 @@
 package Test.test_hello;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import java.io.IOException;
+import java.util.Set;
 
 @Configuration
 public class SecurityConfig {
@@ -15,31 +23,45 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/posts/**", "/images/**").permitAll() // ✅ "/" 비회원도 접근 가능하게 변경
-                        .requestMatchers("/posts/create", "/posts/edit/**", "/posts/delete/**").authenticated() // ✅ 비회원 차단
-                        .anyRequest().authenticated() // 나머지는 로그인 필요
+                        .requestMatchers("/","/register", "/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("A")
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // ✅ 커스텀 로그인 페이지
-                        .defaultSuccessUrl("/", true) // ✅ 로그인 성공 시 "/"로 이동
+                        .loginPage("/login")                      // 로그인 폼 경로
+                        .loginProcessingUrl("/login")             // POST 로그인 처리 URL
+                        .usernameParameter("userId")
+                        .successHandler(customLoginSuccessHandler()) // ✅ 역할에 따라 분기
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/") // ✅ 로그아웃 후 "/"로 이동
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
-                .exceptionHandling(ex -> ex.accessDeniedPage("/access-denied")); // ✅ 접근 권한 문제 시 리디렉션
+                        .logoutUrl("/logout") // 로그아웃 URL
+                        .logoutSuccessUrl("/") // 성공 후 이동
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .deleteCookies("JSESSIONID") // 쿠키 제거
+                        .clearAuthentication(true) // 인증정보 제거
+                );
 
         return http.build();
     }
 
-
-    // ✅ 비밀번호 암호화
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // ✅ 로그인 성공 후 역할(Role)에 따라 분기
+    @Bean
+    public AuthenticationSuccessHandler customLoginSuccessHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
+            Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+
+            if (roles.contains("ROLE_A")) {
+                response.sendRedirect("/admin");
+            } else {
+                response.sendRedirect("/");
+            }
+        };
     }
 }

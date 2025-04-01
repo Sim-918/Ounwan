@@ -2,15 +2,12 @@ package Test.test_hello.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
-import java.util.Collection;
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Getter
@@ -20,28 +17,63 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    idx 로 수정
     private Long id;
+//    userId로 수정
+    @Column(unique = true, nullable = false, length = 30)
+    private String userId;
 
-    @Column(unique = true, nullable = false)
-    private String username;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
 
-    // ✅ 프로필 이미지 필드 추가
     @Column(nullable = false)
-    private String profileImageUrl = "/images/default_image.png";  // ✅ 기본 프로필 이미지 설정
+    private String profileImageUrl = "/images/default_image.png";
 
-    // ✅ 사용자(1) → 게시글(N) 관계
+    @Column(length = 20)
+    private String phoneNum;
+
+    private LocalDateTime cre_dt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.U;
+
+    private LocalDateTime upd_dt;
+
+    @Column(length = 30)
+    private String upd_id;
+
+    @Enumerated(EnumType.STRING)
+    private YesNo del_yn = YesNo.N;
+
+    @Enumerated(EnumType.STRING)
+    private YesNo rep_yn = YesNo.N;
+
+    private int pw_fail_cnt = 0;
+
+    @Enumerated(EnumType.STRING)
+    private YesNo lock_yn = YesNo.N;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
+    public enum Role { A, U }
+    public enum YesNo { Y, N }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList(); // 기본적으로 권한 없음
+        return List.of(() -> "ROLE_" + this.role.name());  // ROLE_A, ROLE_U
+    }
+
+    @Override
+    public String getUsername() {
+        return this.userId;
+    }
+    // ✅ 반드시 존재해야 함!
+    public void setUsername(String userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -63,8 +95,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    @Override
-    public String getUsername() {
-        return this.username;  // username 필드 반환
-    }
+
+
+
 }
