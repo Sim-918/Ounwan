@@ -92,6 +92,7 @@
         const emailInput = document.getElementById("email");
         const passwordInput = document.getElementById("password");
         const submitBtn = document.getElementById("submitBtn");
+        const registerForm = document.getElementById("registerForm");
 
         const errorUserId = document.createElement("div");
         const errorPhone = document.createElement("div");
@@ -106,6 +107,19 @@
         emailInput.after(errorEmail);
         passwordInput.after(errorPassword);
 
+        // 정규표현식 검사 함수들
+        function isValidUserId(userId) {
+            return /^[a-zA-Z0-9]{8,20}$/.test(userId);
+        }
+        function isValidEmail(email) {
+            return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+        }
+        function isValidPassword(password) {
+            return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{10,}$/.test(password);
+        }
+        function isValidPhone(phone) {
+            return /^\d{3}-\d{4}-\d{4}$/.test(phone);
+        }
         function formatPhone(value) {
             const digits = value.replace(/\D/g, "");
             if (digits.length <= 3) return digits;
@@ -113,17 +127,18 @@
             return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
         }
 
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-        function isValidPassword(password) {
-            return password.length >= 10 && /[!@#$%^&*(),.?":{}|<>]/.test(password);
-        }
-        function isValidPhone(phone) {
-            return /^\d{3}-\d{4}-\d{4}$/.test(phone);
+        // 1. 입력 유무에 따라 버튼 활성화
+        function checkIfFilled() {
+            const userId = userIdInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            submitBtn.disabled = !(userId && phone && email && password);
         }
 
-        function validate() {
+        // 2. 클릭 시 유효성 검사 (에러 메시지 표시)
+        registerForm.addEventListener("submit", function (e) {
             const userId = userIdInput.value.trim();
             const phone = phoneInput.value.trim();
             const email = emailInput.value.trim();
@@ -131,15 +146,15 @@
 
             let valid = true;
 
-            if (userId.length < 8) {
-                errorUserId.textContent = "아이디는 8자 이상이어야 합니다.";
+            if (!isValidUserId(userId)) {
+                errorUserId.textContent = "아이디는 영문+숫자 8~20자여야 합니다.";
                 valid = false;
             } else {
                 errorUserId.textContent = "";
             }
 
             if (!isValidPhone(phone)) {
-                errorPhone.textContent = "전화번호 형식은 000-0000-0000 입니다.";
+                errorPhone.textContent = "전화번호는 000-0000-0000 형식입니다.";
                 valid = false;
             } else {
                 errorPhone.textContent = "";
@@ -153,23 +168,31 @@
             }
 
             if (!isValidPassword(password)) {
-                errorPassword.textContent = "비밀번호는 10자 이상이며 특수문자를 포함해야 합니다.";
+                errorPassword.textContent = "비밀번호는 10자 이상, 숫자+특수문자를 포함해야 합니다.";
                 valid = false;
             } else {
                 errorPassword.textContent = "";
             }
 
-            submitBtn.disabled = !valid;
-        }
-
-        userIdInput.addEventListener("input", validate);
-        phoneInput.addEventListener("input", () => {
-            phoneInput.value = formatPhone(phoneInput.value);
-            validate();
+            if (!valid) {
+                e.preventDefault(); // 폼 제출 막기
+            }
         });
-        emailInput.addEventListener("input", validate);
-        passwordInput.addEventListener("input", validate);
+
+        // 3. 이벤트 바인딩 (입력 감지)
+        [userIdInput, phoneInput, emailInput, passwordInput].forEach(input => {
+            input.addEventListener("input", () => {
+                if (input === phoneInput) {
+                    phoneInput.value = formatPhone(phoneInput.value);
+                }
+                checkIfFilled();
+            });
+        });
+
+        // 4. 초기 상태 버튼 비활성화
+        submitBtn.disabled = true;
     </script>
+
 </body>
 
 </html>

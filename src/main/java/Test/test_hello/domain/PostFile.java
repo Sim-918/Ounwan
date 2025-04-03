@@ -25,16 +25,16 @@ public class PostFile {
     @JoinColumn(name = "id22")
     private User user;
 
-    private String origin_filename;
-    private String stored_filename;
+    private String originFilename;
+    private String storedFilename;
     private String filetype;
     private String filesize;
 
-    private LocalDateTime cre_at = LocalDateTime.now();
+    private LocalDateTime creAt = LocalDateTime.now();
 
     @Column(length = 30)
-    private String cre_id;
+    private String creId;
 
     @Enumerated(EnumType.STRING)
-    private User.YesNo del_yn = User.YesNo.N;
+    private User.YesNo delYn = User.YesNo.N;
 }

@@ -35,26 +35,26 @@ public class User implements UserDetails {
     @Column(length = 20)
     private String phoneNum;
 
-    private LocalDateTime cre_dt = LocalDateTime.now();
+    private LocalDateTime creDt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.U;
 
-    private LocalDateTime upd_dt;
+    private LocalDateTime updDt;
 
     @Column(length = 30)
-    private String upd_id;
+    private String updId;
 
     @Enumerated(EnumType.STRING)
-    private YesNo del_yn = YesNo.N;
+    private YesNo delYn = YesNo.N;
 
     @Enumerated(EnumType.STRING)
-    private YesNo rep_yn = YesNo.N;
+    private YesNo repYn = YesNo.N;
 
-    private int pw_fail_cnt = 0;
+    private int pwFailCnt = 0;
 
     @Enumerated(EnumType.STRING)
-    private YesNo lock_yn = YesNo.N;
+    private YesNo lockYn = YesNo.N;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;

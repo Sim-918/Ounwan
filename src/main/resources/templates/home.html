@@ -89,7 +89,7 @@
                 </span>
 
                 <small class="text-body-secondary"
-                       th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm') : '시간 정보 없음'}">
+                       th:text="${post.creDt != null ? #temporals.format(post.creDt, 'yyyy-MM-dd HH:mm') : '시간 정보 없음'}">
                   작성시간
                 </small>
               </div>

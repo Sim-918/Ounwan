@@ -27,20 +27,13 @@ public class UserController {
         return "register";
     }
 
-//    @PostMapping("/register")
-//    public String registerUser(@ModelAttribute User user) {
-//        if (user.getRole() == null) {
-//            user.setRole(User.Role.U);
-//        }
-//        userService.registerUser(user);
-//        return "redirect:/login";
-//    }
+//  todo 회원가입 실패, 성공 alert
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute UserRegisterDto userDto, BindingResult result) {
         if (result.hasErrors()) return "register";
 
         userService.register(userDto);
-        return "redirect:/login";
+        return "redirect:/login?success=true";
     }
 
 }

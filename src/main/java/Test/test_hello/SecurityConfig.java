@@ -21,6 +21,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        todo security공부->깃허브 readme 메모
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/register", "/login", "/css/**", "/js/**").permitAll()
